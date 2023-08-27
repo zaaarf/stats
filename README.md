@@ -4,7 +4,7 @@ Generate daily updated visualizations of user and repository statistics from the
 
 > A modification of [`jstrieb/github-stats`](https://github.com/jstrieb/github-stats) visualizations with new and improved statistics and more options!
 
-[![GitStats Overview](https://raw.githubusercontent.com/R055A/GitStats/actions_branch/generated_images/overview.svg)![GitStats Languages](https://raw.githubusercontent.com/R055A/GitStats/actions_branch/generated_images/languages.svg)](https://github.com/R055A/GitStats)
+[![GitStats Overview](https://raw.githubusercontent.com/zaaarf/stats/actions_branch/generated_images/overview.svg)![GitStats Languages](https://raw.githubusercontent.com/zaaarf/stats/actions_branch/generated_images/languages.svg)](https://github.com/R055A/GitStats)
 
 # :rocket: Instructions
 
