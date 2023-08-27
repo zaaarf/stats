@@ -46,9 +46,8 @@ class EnvironmentVariables:
             token_map: dict[str, str] = dict()
             for kv in other_tokens.split(","):
                 arr = kv.split(":")
-                print(f"{arr[0]}")
-                print(f"{arr[1]}")
-                token_map[arr[0]] = arr[1]
+                if len(arr) != 0 and len(arr) % 2 == 0:
+                    token_map[arr[0]] = arr[1]
             self.other_tokens = token_map
 
         if exclude_repos is None:
