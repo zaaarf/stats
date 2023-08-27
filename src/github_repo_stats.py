@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from typing import Dict, Optional, Set, Tuple, Any, cast
+from typing import Dict, List, Tuple, Optional, Set, Tuple, Any, cast
 from aiohttp import ClientSession
 from datetime import date, timedelta
 
@@ -27,10 +27,11 @@ class GitHubRepoStats(object):
 
         # list of queries instead
         self.queries: list[GitHubApiQueries] = []
-        self.queries.append(GitHubApiQueries(
+        self.main_query = GitHubApiQueries(
             username=self.environment_vars.username,
             access_token=self.environment_vars.access_token,
-            session=session))
+            session=session)
+        self.queries.append(self.main_query)
         for user in environment_vars.other_tokens:
             self.queries.append(GitHubApiQueries(
                 username=user,
@@ -43,7 +44,7 @@ class GitHubRepoStats(object):
         self._total_contributions: Optional[int] = None
         self._languages: Optional[Dict[str, Any]] = None
         self._excluded_languages: Optional[Set[str]] = None
-        self._repos: Optional[Set[str]] = None
+        self._repos: Optional[Dict[str, GitHubApiQueries]] = None
         self._users_lines_changed: Optional[Tuple[int, int]] = None
         self._avg_percent: Optional[str] = None
         self._views: Optional[int] = None
@@ -140,8 +141,9 @@ class GitHubRepoStats(object):
 
     
         while True:
-            contrib_repos = {}
-            owned_repos = {}
+            contrib_repos = []
+            owned_repos = []
+            query_ordered = [] #jank but it should work
 
             for query in self.queries: #TODO is this right?
                 raw_results = await query.query(
@@ -150,7 +152,7 @@ class GitHubRepoStats(object):
                 )
                 raw_results = raw_results if raw_results is not None else {}
 
-                if query == query[0]: #TODO is this right?
+                if query == self.main_query: #TODO is this right?
                     self._name = raw_results\
                         .get("data", {})\
                         .get("viewer", {})\
@@ -162,36 +164,41 @@ class GitHubRepoStats(object):
                                     .get("viewer", {})
                                     .get("login", "No Name"))
 
-                contrib_repos[(raw_results
+                contrib_repos.append(raw_results
                                 .get("data", {})
                                 .get("viewer", {})
-                                .get("repositoriesContributedTo", {}))] = query
+                                .get("repositoriesContributedTo", {}))
 
-                owned_repos[(raw_results
+                owned_repos.append(raw_results
                             .get("data", {})
                             .get("viewer", {})
-                            .get("repositories", {}))] = query
+                            .get("repositories", {}))
+                
+                query_ordered.append(query)
 
-            repos = {}
-            for o in owned_repos:
+            repos = []
+            query_ordered_repeat = []
+            for index, o in enumerate(owned_repos):
                 for n in o.get("nodes", []):
-                    repos[n] = owned_repos[o]
+                    repos.append(n)
+                    query_ordered_repeat.append(query_ordered[index])
             #repos = owned_repos.get("nodes", []) TODO: is this right?
 
             if not self.environment_vars.exclude_contrib_repos:
-                for c in contrib_repos: #TODO is this right
+                for index, c in enumerate(contrib_repos):
                     for n in c.get("nodes", []):
-                        repos[n] = contrib_repos[c]
+                        repos.append(n)
+                        query_ordered_repeat.append(query_ordered[index])
                 #repos += contrib_repos.get("nodes", [])
 
-            for repo in repos:
+            for index, repo in enumerate(repos):
                 if not repo or await self.is_repo_type_excluded(repo):
                     continue
 
                 name = repo.get("nameWithOwner")
                 if await self.is_repo_name_invalid(name):
                     continue
-                self._repos[name] = repos[repo]
+                self._repos[name] = query_ordered_repeat[index]
 
                 self._stargazers += repo.get("stargazers").get("totalCount", 0)
                 self._forks += repo.get("forkCount", 0)
@@ -217,11 +224,11 @@ class GitHubRepoStats(object):
                             "occurrences": 1,
                             "color": lang.get("node", {}).get("color"),
                         }
-
-            is_cur_owned = owned_repos\
+              
+            is_cur_owned = o\
                 .get("pageInfo", {})\
                 .get("hasNextPage", False)
-            is_cur_contrib = contrib_repos\
+            is_cur_contrib = c\
                 .get("pageInfo", {})\
                 .get("hasNextPage", False)
 
@@ -237,14 +244,14 @@ class GitHubRepoStats(object):
 
         if not self.environment_vars.exclude_contrib_repos:
             env_repos = self.environment_vars.manually_added_repos
-            lang_cols = self.queries[0].get_language_colors()
+            lang_cols = self.main_query.get_language_colors()
 
             for repo in env_repos:
                 if await self.is_repo_name_invalid(repo):
                     continue
-                self._repos[repo] = self.queries[0]
+                self._repos[repo] = self.main_query
 
-                repo_stats = await self.queries[0].query_rest(f"/repos/{repo}") #TODO allow manually added repos to work with other accs
+                repo_stats = await self.main_query.query_rest(f"/repos/{repo}") #TODO allow manually added repos to work with other accs
                 if await self.is_repo_type_excluded(repo_stats):
                     continue
 
@@ -257,7 +264,7 @@ class GitHubRepoStats(object):
 
                 # TODO: Improve languages to scale by number of contributions to specific filetypes
                 if repo_stats.get("language"):
-                    langs = await self.queries[0].\
+                    langs = await self.main_query.\
                         query_rest(f"/repos/{repo}/languages")
 
                     for lang, size in langs.items():
@@ -346,15 +353,18 @@ class GitHubRepoStats(object):
         return {k: v.get("prop", 0) for (k, v) in self._languages.items()}
 
     @property
-    async def repos(self) -> Dict[str, GitHubApiQueries]:
+    async def repos(self) -> List:
         """
         :return: list of names of user's repos
         """
-        if self._repos is not None:
-            return self._repos
-        await self.get_stats()
-        assert self._repos is not None
-        return self._repos
+        if self._repos is None:
+            await self.get_stats()
+            assert self._repos is not None
+        ls: List[Tuple(str, GitHubApiQueries)] = list()
+        for r in self._repos:
+            ls.append((r, self._repos[r]))
+        return ls
+        #return self._repos
 
     @property
     async def total_contributions(self) -> int:
@@ -477,7 +487,8 @@ class GitHubRepoStats(object):
 
         today_view_count = 0
         for repo in await self.repos:
-            r = await self.repos[repo].query_rest(f"/repos/{repo}/traffic/views")
+            (reponame, query) = repo
+            r = await query.query_rest(f"/repos/{reponame}/traffic/views")
 
             for view in r.get("views", []):
                 if view.get("timestamp")[:10] == today:
@@ -521,8 +532,9 @@ class GitHubRepoStats(object):
         self._collab_repos = set()
 
         for repo in await self.repos:
-            r = await self.repos[repo]\
-                .query_rest(f"/repos/{repo}/collaborators")
+            (reponame, query) = repo
+            r = await query\
+                .query_rest(f"/repos/{reponame}/collaborators")
 
             for obj in r:
                 if isinstance(obj, dict):
@@ -566,8 +578,9 @@ class GitHubRepoStats(object):
         self._pull_requests = 0
 
         for repo in await self.repos:
-            r = await self.repos[repo]\
-                .query_rest(f"/repos/{repo}/pulls?state=all")
+            (reponame, query) = repo
+            r = await query\
+                .query_rest(f"/repos/{reponame}/pulls?state=all")
 
             for obj in r:
                 if isinstance(obj, dict) and obj.get('user', {}).get('login') == self.environment_vars.username:
@@ -584,9 +597,10 @@ class GitHubRepoStats(object):
 
         self._issues = 0
 
-        for repo in await self.repos: #TODO tie repo
-            r = await self.repos[repo]\
-                .query_rest(f"/repos/{repo}/issues?state=all")
+        for repo in await self.repos:
+            (reponame, query) = repo
+            r = await query\
+                .query_rest(f"/repos/{reponame}/issues?state=all")
 
             for obj in r:
                 if isinstance(obj, dict) and obj.get('user', {}).get('login') == self.environment_vars.username:
