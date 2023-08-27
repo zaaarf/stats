@@ -18,6 +18,7 @@ class EnvironmentVariables:
     def __init__(self,
                  username: str,
                  access_token: str,
+                 other_tokens: Optional[str] = getenv("OTHER_TOKENS"),
                  exclude_repos: Optional[str] = getenv("EXCLUDED"),
                  exclude_langs: Optional[str] = getenv("EXCLUDED_LANGS"),
                  include_forked_repos: str = getenv("INCLUDE_FORKED_REPOS"),
@@ -38,6 +39,15 @@ class EnvironmentVariables:
 
         self.username = username
         self.access_token = access_token
+
+        if other_tokens is None:
+            self.other_tokens = set()
+        else:
+            token_map: dict[str, str] = dict()
+            for kv in other_tokens.split(","):
+                arr = kv.split(":")
+                token_map[arr[0]] = arr[1]
+            self.other_tokens = token_map
 
         if exclude_repos is None:
             self.exclude_repos = set()

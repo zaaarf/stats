@@ -14,6 +14,7 @@ from src.env_vars import EnvironmentVariables
 # REQUIRED
 ACCESS_TOKEN = getenv("ACCESS_TOKEN")  # or manually enter ACCESS_TOKEN string
 GITHUB_ACTOR = getenv("GITHUB_ACTOR")  # or manually enter "<GitHub Username>"
+OTHER_TOKENS = getenv("OTHER_TOKENS")  # or manually enter kv pairs of accs:tokens.
 
 # OPTIONAL
 EXCLUDED_REPOS = getenv("EXCLUDED")  # or enter: "[owner/repo],...,[owner/repo]"
@@ -48,6 +49,7 @@ async def main() -> None:
             environment_vars=EnvironmentVariables(
                 username=GITHUB_ACTOR,
                 access_token=ACCESS_TOKEN,
+                other_tokens=OTHER_TOKENS,
                 exclude_repos=EXCLUDED_REPOS,
                 exclude_langs=EXCLUDED_LANGS,
                 include_forked_repos=INCLUDE_FORKED_REPOS,

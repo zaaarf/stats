@@ -24,10 +24,18 @@ class GitHubRepoStats(object):
                  environment_vars: EnvironmentVariables,
                  session: ClientSession):
         self.environment_vars: EnvironmentVariables = environment_vars
-        self.queries = GitHubApiQueries(
+
+        # list of queries instead
+        self.queries: list[GitHubApiQueries] = []
+        self.queries.append(GitHubApiQueries(
             username=self.environment_vars.username,
             access_token=self.environment_vars.access_token,
-            session=session)
+            session=session))
+        for user in environment_vars.other_tokens:
+            self.queries.append(GitHubApiQueries(
+                username=user,
+                access_token=environment_vars.other_tokens[user],
+                session=session))
 
         self._name: Optional[str] = None
         self._stargazers: Optional[int] = None
@@ -124,43 +132,57 @@ class GitHubRepoStats(object):
         self._forks = 0
         self._excluded_languages = set()
         self._languages = dict()
-        self._repos = set()
+        self._repos = dict()
         self._empty_repos = set()
 
         next_owned = None
         next_contrib = None
 
+    
         while True:
-            raw_results = await self.queries.query(
-                GitHubApiQueries.repos_overview(owned_cursor=next_owned,
-                                                contrib_cursor=next_contrib)
-            )
-            raw_results = raw_results if raw_results is not None else {}
+            contrib_repos = {}
+            owned_repos = {}
 
-            self._name = raw_results\
-                .get("data", {})\
-                .get("viewer", {})\
-                .get("name", None)
+            for query in self.queries: #TODO is this right?
+                raw_results = await query.query(
+                    GitHubApiQueries.repos_overview(owned_cursor=next_owned,
+                                                    contrib_cursor=next_contrib)
+                )
+                raw_results = raw_results if raw_results is not None else {}
 
-            if self._name is None:
-                self._name = (raw_results
-                              .get("data", {})
-                              .get("viewer", {})
-                              .get("login", "No Name"))
+                if query == query[0]: #TODO is this right?
+                    self._name = raw_results\
+                        .get("data", {})\
+                        .get("viewer", {})\
+                        .get("name", None)
 
-            contrib_repos = (raw_results
-                             .get("data", {})
-                             .get("viewer", {})
-                             .get("repositoriesContributedTo", {}))
+                    if self._name is None:
+                        self._name = (raw_results
+                                    .get("data", {})
+                                    .get("viewer", {})
+                                    .get("login", "No Name"))
 
-            owned_repos = (raw_results
-                           .get("data", {})
-                           .get("viewer", {})
-                           .get("repositories", {}))
+                contrib_repos[(raw_results
+                                .get("data", {})
+                                .get("viewer", {})
+                                .get("repositoriesContributedTo", {}))] = query
 
-            repos = owned_repos.get("nodes", [])
+                owned_repos[(raw_results
+                            .get("data", {})
+                            .get("viewer", {})
+                            .get("repositories", {}))] = query
+
+            repos = {}
+            for o in owned_repos:
+                for n in o.get("nodes", []):
+                    repos[n] = owned_repos[o]
+            #repos = owned_repos.get("nodes", []) TODO: is this right?
+
             if not self.environment_vars.exclude_contrib_repos:
-                repos += contrib_repos.get("nodes", [])
+                for c in contrib_repos: #TODO is this right
+                    for n in c.get("nodes", []):
+                        repos[n] = contrib_repos[c]
+                #repos += contrib_repos.get("nodes", [])
 
             for repo in repos:
                 if not repo or await self.is_repo_type_excluded(repo):
@@ -169,7 +191,7 @@ class GitHubRepoStats(object):
                 name = repo.get("nameWithOwner")
                 if await self.is_repo_name_invalid(name):
                     continue
-                self._repos.add(name)
+                self._repos[name] = repos[repo]
 
                 self._stargazers += repo.get("stargazers").get("totalCount", 0)
                 self._forks += repo.get("forkCount", 0)
@@ -215,14 +237,14 @@ class GitHubRepoStats(object):
 
         if not self.environment_vars.exclude_contrib_repos:
             env_repos = self.environment_vars.manually_added_repos
-            lang_cols = self.queries.get_language_colors()
+            lang_cols = self.queries[0].get_language_colors()
 
             for repo in env_repos:
                 if await self.is_repo_name_invalid(repo):
                     continue
-                self._repos.add(repo)
+                self._repos[repo] = self.queries[0]
 
-                repo_stats = await self.queries.query_rest(f"/repos/{repo}")
+                repo_stats = await self.queries[0].query_rest(f"/repos/{repo}") #TODO allow manually added repos to work with other accs
                 if await self.is_repo_type_excluded(repo_stats):
                     continue
 
@@ -235,7 +257,7 @@ class GitHubRepoStats(object):
 
                 # TODO: Improve languages to scale by number of contributions to specific filetypes
                 if repo_stats.get("language"):
-                    langs = await self.queries.\
+                    langs = await self.queries[0].\
                         query_rest(f"/repos/{repo}/languages")
 
                     for lang, size in langs.items():
@@ -324,7 +346,7 @@ class GitHubRepoStats(object):
         return {k: v.get("prop", 0) for (k, v) in self._languages.items()}
 
     @property
-    async def repos(self) -> Set[str]:
+    async def repos(self) -> Dict[str, GitHubApiQueries]:
         """
         :return: list of names of user's repos
         """
@@ -343,21 +365,22 @@ class GitHubRepoStats(object):
             return self._total_contributions
         self._total_contributions = 0
 
-        years = ((await self.queries.query(GitHubApiQueries.contributions_all_years()))
-                 .get("data", {})
-                 .get("viewer", {})
-                 .get("contributionsCollection", {})
-                 .get("contributionYears", []))
+        for query in self.queries:
+            years = ((await query.query(GitHubApiQueries.contributions_all_years()))
+                    .get("data", {})
+                    .get("viewer", {})
+                    .get("contributionsCollection", {})
+                    .get("contributionYears", []))
 
-        by_year = ((await self.queries.query(GitHubApiQueries.all_contributions(years)))
-                   .get("data", {})
-                   .get("viewer", {})
-                   .values())
+            by_year = ((await query.query(GitHubApiQueries.all_contributions(years)))
+                    .get("data", {})
+                    .get("viewer", {})
+                    .values())
 
-        for year in by_year:
-            self._total_contributions += year\
-                .get("contributionCalendar", {})\
-                .get("totalContributions", 0)
+            for year in by_year:
+                self._total_contributions += year\
+                    .get("contributionCalendar", {})\
+                    .get("totalContributions", 0)
         return cast(int, self._total_contributions)
 
     @property
@@ -386,26 +409,27 @@ class GitHubRepoStats(object):
             author_additions = 0
             author_deletions = 0
 
-            r = await self.queries\
-                .query_rest(f"/repos/{repo}/stats/contributors")
+            for query in self.queries:
+                r = await query\
+                    .query_rest(f"/repos/{repo}/stats/contributors")
 
-            for author_obj in r:
-                # Handle malformed response from API by skipping this repo
-                if not isinstance(author_obj, dict) or not isinstance(
-                        author_obj.get("author", {}), dict
-                ):
-                    continue
-                author = author_obj.get("author", {}).get("login", "")
-                contributor_set.add(author)  # count number of total other contributors
+                for author_obj in r:
+                    # Handle malformed response from API by skipping this repo
+                    if not isinstance(author_obj, dict) or not isinstance(
+                            author_obj.get("author", {}), dict
+                    ):
+                        continue
+                    author = author_obj.get("author", {}).get("login", "")
+                    contributor_set.add(author)  # count number of total other contributors
 
-                if author != self.environment_vars.username and author not in self.__EXCLUDED_USER_NAMES:
-                    for week in author_obj.get("weeks", []):
-                        other_authors_total_changes += week.get("a", 0)
-                        other_authors_total_changes += week.get("d", 0)
-                else:
-                    for week in author_obj.get("weeks", []):
-                        author_additions += week.get("a", 0)
-                        author_deletions += week.get("d", 0)
+                    if author != self.environment_vars.username and author not in self.__EXCLUDED_USER_NAMES:
+                        for week in author_obj.get("weeks", []):
+                            other_authors_total_changes += week.get("a", 0)
+                            other_authors_total_changes += week.get("d", 0)
+                    else:
+                        for week in author_obj.get("weeks", []):
+                            author_additions += week.get("a", 0)
+                            author_deletions += week.get("d", 0)
             author_total_additions += author_additions
             author_total_deletions += author_deletions
 
@@ -453,7 +477,7 @@ class GitHubRepoStats(object):
 
         today_view_count = 0
         for repo in await self.repos:
-            r = await self.queries.query_rest(f"/repos/{repo}/traffic/views")
+            r = await self.repos[repo].query_rest(f"/repos/{repo}/traffic/views")
 
             for view in r.get("views", []):
                 if view.get("timestamp")[:10] == today:
@@ -497,7 +521,7 @@ class GitHubRepoStats(object):
         self._collab_repos = set()
 
         for repo in await self.repos:
-            r = await self.queries\
+            r = await self.repos[repo]\
                 .query_rest(f"/repos/{repo}/collaborators")
 
             for obj in r:
@@ -542,7 +566,7 @@ class GitHubRepoStats(object):
         self._pull_requests = 0
 
         for repo in await self.repos:
-            r = await self.queries\
+            r = await self.repos[repo]\
                 .query_rest(f"/repos/{repo}/pulls?state=all")
 
             for obj in r:
@@ -560,8 +584,8 @@ class GitHubRepoStats(object):
 
         self._issues = 0
 
-        for repo in await self.repos:
-            r = await self.queries\
+        for repo in await self.repos: #TODO tie repo
+            r = await self.repos[repo]\
                 .query_rest(f"/repos/{repo}/issues?state=all")
 
             for obj in r:

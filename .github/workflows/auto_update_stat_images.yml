@@ -55,6 +55,7 @@ jobs:
         python3 git_stats_imgs.py
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        OTHER_TOKENS: ${{ secrets.OTHER_TOKENS }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         EXCLUDED: ${{ secrets.EXCLUDED }}
         EXCLUDED_LANGS: ${{ secrets.EXCLUDED_LANGS }}
