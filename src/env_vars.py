@@ -41,11 +41,13 @@ class EnvironmentVariables:
         self.access_token = access_token
 
         if other_tokens is None:
-            self.other_tokens = set()
+            self.other_tokens = dict()
         else:
             token_map: dict[str, str] = dict()
             for kv in other_tokens.split(","):
                 arr = kv.split(":")
+                print(f"{arr[0]}")
+                print(f"{arr[1]}")
                 token_map[arr[0]] = arr[1]
             self.other_tokens = token_map
 
