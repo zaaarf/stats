@@ -154,7 +154,7 @@
 
           <div>
             <span class="progress">
-              <span style="background-color: #b07219;width: 57.55256%;" class="progress-item"></span><span style="background-color: #3572A5;width: 31.85094%;" class="progress-item"></span><span style="background-color: #000080;width: 4.22715%;" class="progress-item"></span><span style="background-color: #dea584;width: 2.62787%;" class="progress-item"></span><span style="background-color: #336790;width: 1.08409%;" class="progress-item"></span><span style="background-color: #b2b7f8;width: 1.00575%;" class="progress-item"></span><span style="background-color: #89e051;width: 0.42462%;" class="progress-item"></span><span style="background-color: #C1F12E;width: 0.39892%;" class="progress-item"></span><span style="background-color: #f1e05a;width: 0.29246%;" class="progress-item"></span><span style="background-color: #6E4C13;width: 0.21010%;" class="progress-item"></span><span style="background-color: #E6EFBB;width: 0.09122%;" class="progress-item"></span><span style="background-color: #44a51c;width: 0.06242%;" class="progress-item"></span><span style="background-color: #e34c26;width: 0.05929%;" class="progress-item"></span><span style="background-color: #a56de2;width: 0.04995%;" class="progress-item"></span><span style="background-color: #d0b68c;width: 0.03699%;" class="progress-item"></span><span style="background-color: #DA3434;width: 0.02114%;" class="progress-item"></span><span style="background-color: #007800;width: 0.00453%;" class="progress-item"></span>
+              <span style="background-color: #b07219;width: 57.50107%;" class="progress-item"></span><span style="background-color: #3572A5;width: 31.82244%;" class="progress-item"></span><span style="background-color: #000080;width: 4.22337%;" class="progress-item"></span><span style="background-color: #dea584;width: 2.71499%;" class="progress-item"></span><span style="background-color: #336790;width: 1.08312%;" class="progress-item"></span><span style="background-color: #b2b7f8;width: 1.00485%;" class="progress-item"></span><span style="background-color: #89e051;width: 0.42424%;" class="progress-item"></span><span style="background-color: #C1F12E;width: 0.39856%;" class="progress-item"></span><span style="background-color: #f1e05a;width: 0.29219%;" class="progress-item"></span><span style="background-color: #6E4C13;width: 0.20991%;" class="progress-item"></span><span style="background-color: #E6EFBB;width: 0.09114%;" class="progress-item"></span><span style="background-color: #44a51c;width: 0.06236%;" class="progress-item"></span><span style="background-color: #e34c26;width: 0.05923%;" class="progress-item"></span><span style="background-color: #a56de2;width: 0.04991%;" class="progress-item"></span><span style="background-color: #d0b68c;width: 0.03696%;" class="progress-item"></span><span style="background-color: #DA3434;width: 0.02113%;" class="progress-item"></span><span style="background-color: #007800;width: 0.00453%;" class="progress-item"></span>
             </span>
           </div>
 
@@ -176,7 +176,7 @@
                         Java
                     </span>
                     <span class="percent">
-                        57.55%
+                        57.50%
                     </span>
             </li>
             <li style="animation-delay: 150ms;">
@@ -195,7 +195,7 @@
                         Python
                     </span>
                     <span class="percent">
-                        31.85%
+                        31.82%
                     </span>
             </li>
             <li style="animation-delay: 300ms;">
@@ -214,7 +214,7 @@
                         Lua
                     </span>
                     <span class="percent">
-                        4.23%
+                        4.22%
                     </span>
             </li>
             <li style="animation-delay: 450ms;">
@@ -233,7 +233,7 @@
                         Rust
                     </span>
                     <span class="percent">
-                        2.63%
+                        2.71%
                     </span>
             </li>
             <li style="animation-delay: 600ms;">
@@ -271,7 +271,7 @@
                         Verilog
                     </span>
                     <span class="percent">
-                        1.01%
+                        1.00%
                     </span>
             </li>
             <li style="animation-delay: 900ms;">
