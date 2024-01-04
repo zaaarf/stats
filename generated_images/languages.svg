@@ -154,7 +154,7 @@
 
           <div>
             <span class="progress">
-              <span style="background-color: #f34b7d;width: 39.64734%;" class="progress-item"></span><span style="background-color: #b07219;width: 21.84599%;" class="progress-item"></span><span style="background-color: #3572A5;width: 12.30462%;" class="progress-item"></span><span style="background-color: #178600;width: 9.05673%;" class="progress-item"></span><span style="background-color: #555555;width: 4.99705%;" class="progress-item"></span><span style="background-color: #e34c26;width: 4.71859%;" class="progress-item"></span><span style="background-color: #355570;width: 1.67965%;" class="progress-item"></span><span style="background-color: #dea584;width: 1.65847%;" class="progress-item"></span><span style="background-color: #000080;width: 1.53392%;" class="progress-item"></span><span style="background-color: #DA3434;width: 0.87546%;" class="progress-item"></span><span style="background-color: #336790;width: 0.39339%;" class="progress-item"></span><span style="background-color: #b2b7f8;width: 0.36496%;" class="progress-item"></span><span style="background-color: #89e051;width: 0.22521%;" class="progress-item"></span><span style="background-color: #C1F12E;width: 0.14476%;" class="progress-item"></span><span style="background-color: #427819;width: 0.11747%;" class="progress-item"></span><span style="background-color: #f1e05a;width: 0.11065%;" class="progress-item"></span><span style="background-color: #6E4C13;width: 0.07699%;" class="progress-item"></span><span style="background-color: #6866fb;width: 0.06303%;" class="progress-item"></span><span style="background-color: #563d7c;width: 0.05296%;" class="progress-item"></span><span style="background-color: #7e7eff;width: 0.04161%;" class="progress-item"></span><span style="background-color: #E6EFBB;width: 0.03533%;" class="progress-item"></span><span style="background-color: #44a51c;width: 0.02265%;" class="progress-item"></span><span style="background-color: #a56de2;width: 0.01813%;" class="progress-item"></span><span style="background-color: #d0b68c;width: 0.01342%;" class="progress-item"></span><span style="background-color: #007800;width: 0.00164%;" class="progress-item"></span>
+              <span style="background-color: #f34b7d;width: 39.71020%;" class="progress-item"></span><span style="background-color: #b07219;width: 21.82323%;" class="progress-item"></span><span style="background-color: #3572A5;width: 12.29180%;" class="progress-item"></span><span style="background-color: #178600;width: 9.04730%;" class="progress-item"></span><span style="background-color: #555555;width: 4.99184%;" class="progress-item"></span><span style="background-color: #e34c26;width: 4.71367%;" class="progress-item"></span><span style="background-color: #355570;width: 1.67790%;" class="progress-item"></span><span style="background-color: #dea584;width: 1.65674%;" class="progress-item"></span><span style="background-color: #000080;width: 1.53232%;" class="progress-item"></span><span style="background-color: #DA3434;width: 0.87455%;" class="progress-item"></span><span style="background-color: #336790;width: 0.39298%;" class="progress-item"></span><span style="background-color: #b2b7f8;width: 0.36458%;" class="progress-item"></span><span style="background-color: #89e051;width: 0.22498%;" class="progress-item"></span><span style="background-color: #C1F12E;width: 0.14461%;" class="progress-item"></span><span style="background-color: #427819;width: 0.11735%;" class="progress-item"></span><span style="background-color: #f1e05a;width: 0.11053%;" class="progress-item"></span><span style="background-color: #6E4C13;width: 0.07691%;" class="progress-item"></span><span style="background-color: #6866fb;width: 0.06296%;" class="progress-item"></span><span style="background-color: #563d7c;width: 0.05291%;" class="progress-item"></span><span style="background-color: #7e7eff;width: 0.04157%;" class="progress-item"></span><span style="background-color: #E6EFBB;width: 0.03530%;" class="progress-item"></span><span style="background-color: #44a51c;width: 0.02263%;" class="progress-item"></span><span style="background-color: #a56de2;width: 0.01811%;" class="progress-item"></span><span style="background-color: #d0b68c;width: 0.01341%;" class="progress-item"></span><span style="background-color: #007800;width: 0.00164%;" class="progress-item"></span>
             </span>
           </div>
 
@@ -176,7 +176,7 @@
                         C++
                     </span>
                     <span class="percent">
-                        39.65%
+                        39.71%
                     </span>
             </li>
             <li style="animation-delay: 150ms;">
@@ -195,7 +195,7 @@
                         Java
                     </span>
                     <span class="percent">
-                        21.85%
+                        21.82%
                     </span>
             </li>
             <li style="animation-delay: 300ms;">
@@ -214,7 +214,7 @@
                         Python
                     </span>
                     <span class="percent">
-                        12.30%
+                        12.29%
                     </span>
             </li>
             <li style="animation-delay: 450ms;">
@@ -233,7 +233,7 @@
                         C#
                     </span>
                     <span class="percent">
-                        9.06%
+                        9.05%
                     </span>
             </li>
             <li style="animation-delay: 600ms;">
@@ -252,7 +252,7 @@
                         C
                     </span>
                     <span class="percent">
-                        5.00%
+                        4.99%
                     </span>
             </li>
             <li style="animation-delay: 750ms;">
@@ -271,7 +271,7 @@
                         HTML
                     </span>
                     <span class="percent">
-                        4.72%
+                        4.71%
                     </span>
             </li>
             <li style="animation-delay: 900ms;">
@@ -347,7 +347,7 @@
                         CMake
                     </span>
                     <span class="percent">
-                        0.88%
+                        0.87%
                     </span>
             </li>
             <li style="animation-delay: 1500ms;">
@@ -404,7 +404,7 @@
                         Shell
                     </span>
                     <span class="percent">
-                        0.23%
+                        0.22%
                     </span>
             </li>
             <li style="animation-delay: 1950ms;">
