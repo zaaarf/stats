@@ -444,7 +444,7 @@ class GitHubRepoStats(object):
             .get("contributionYears", [])
         )
 
-        by_year = (
+        by_year: list[dict[str, dict[str, int]]] = list(
             (
                 await self.queries.query(
                     generated_query=GitHubApiQueries.all_contributions(years=years)
