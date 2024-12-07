@@ -1,10 +1,28 @@
 # 📈 [GitHub Stats Visualization](https://github.com/R055A/GitStats) 🔭
 
-Generate daily updated visualizations of user and repository statistics from the GitHub [GraphQL](https://docs.github.com/en/graphql) and [REST](https://docs.github.com/en/rest) APIs using GitHub [Actions](https://docs.github.com/en/actions) and [Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Customizable visualizations support dark and light mode and can adapt to device sizes.
+Generate regularly updated visualizations of user and repository statistics from the GitHub [GraphQL](https://docs.github.com/en/graphql) and [REST](https://docs.github.com/en/rest) APIs using GitHub [Actions](https://docs.github.com/en/actions) and [Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Customizable visualizations support dark and light mode and can adapt to device sizes.
 
 > A modification of [`jstrieb/github-stats`](https://github.com/jstrieb/github-stats) visualizations with new and improved statistics and more options!
 
 [![GitStats Overview](https://raw.githubusercontent.com/zaaarf/stats/actions_branch/generated_images/overview.svg)![GitStats Languages](https://raw.githubusercontent.com/zaaarf/stats/actions_branch/generated_images/languages.svg)](https://github.com/R055A/GitStats)
+
+> _Note: my '**Avg contributions**' stats is customized to only consider collaborative [university project repos](https://github.com/University-Project-Repos)_
+
+## Description of Statistical Terminology
+
+| GitHub Statistics Term         | Description                                                                                                    |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------|
+| All-time GitHub contributions  | Count of all contributions ([as defined by GitHub](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/managing-contribution-settings-on-your-profile/viewing-contributions-on-your-profile)) to any and all repositories any time for a given user |
+| Lines of code changes*         | Sum of all code additions and deletions to all repositories contributed to for a user, measured by lines       |
+| Avg contributions [weighted]*  | Average code changes per collaborative repository for a user [weighted relative to contributor count]          |
+| Repos contributed [% collab]*  | Count of all repositories contributed to by a user [including percent in collaboration with others]            |
+| Repo views (as of YYYY-MM-DD)* | Sum of views to all repositories since created, if owned, or contributed to (from a given date)                | 
+| Repo collaborators*            | Sum of collaborator and contributor counts for all repositories contributed to or owned for a user             |
+| Repo forks*                    | Sum of all-time fork counts for all repositories contributed to or owned for a user                            |
+| Repo stars*                    | Sum of all-time star counts for all repositories contributed to or owned for a user                            |
+| # [+#] Implemented Languages*  | Listed [and hidden] percentages of implemented languages relative to sizes of files contributed to             |
+
+> \* Customisable as instructed in the :closed_lock_with_key: Options section below
 
 # :rocket: Instructions
 
@@ -48,7 +66,7 @@ Generate daily updated visualizations of user and repository statistics from the
       1. For the **first time**, or to **reset stored statistics** (although this is done with every push to the main):
          * Click the link to: [go to the **Generate Git Stats Images** GitHub Actions workflow](../../actions/workflows/non_auto_generate_stat_images.yml)
          > *This is required if the `actions_branch` branch is not created, as it is created when run*
-      2. Otherwise, for **updating** generated statistics visualizations (although this is automatically done daily):
+      2. Otherwise, for **updating** generated statistics visualizations (although this is automatically done ):
          * Click the link to: [go to the **Auto Update Stats Images** GitHub Actions workflow](../../actions/workflows/auto_update_stat_images.yml)
          > *This requires the `actions_branch` branch to first be created with generated statistics visualizations*
    2. With the GitHub Actions page open, click the '***Run workflow***' dropdown menu button
@@ -65,7 +83,7 @@ Generate daily updated visualizations of user and repository statistics from the
 
 ### Display Generated Statistics
 
-6. To display the generated statistics, static URLs can be used for images that are updated daily:
+6. To display the generated statistics, static URLs can be used for images that are updated weekly:
    1. For generated language statistics visualizations (replacing `<username>` with your GitHub username):
    ```md
    ![](https://raw.githubusercontent.com/<username>/GitStats/actions_branch/generated_images/languages.svg)
@@ -108,7 +126,16 @@ Generate daily updated visualizations of user and repository statistics from the
     * `[language],[language],...,[language]`
   * example:
     * `HTML,Jupyter Notebook,Makefile,Dockerfile`
-* ### Optional Secret *Name*: `INCLUDE_FORKED_REPOS`
+* ### Optional Secret *Name*: `EXCLUDED_REPO_LANGS`
+  For excluding any/all language statistics specific to a repository from being included in the generated visualizations
+  
+  **Instructions**:
+  * enter *Value* in the following format (separated by commas):
+    * `[owner/repo--language...--language],[owner/repo--language...--language],...,[owner/repo--language...--language]`
+    * `--language` denotes a language in the repository to be excluded from stats or exclude this for all repo languages
+  * example:
+    * `jstrieb/github-stats--python,rahul-jha98/github-stats-transparent,idiotWu/stats--python--shell`
+* ### Optional Secret *Name*: `IS_INCLUDE_FORKED_REPOS`
   Boolean option for including forked repositories in the generated statistic visualizations. These could repeat statistical calculations
     - `false` by default
 
@@ -117,7 +144,7 @@ Generate daily updated visualizations of user and repository statistics from the
     * `<boolean>`
   * examples:
     * `true`
-* ### Optional Secret *Name*: `EXCLUDE_CONTRIB_REPOS`
+* ### Optional Secret *Name*: `IS_EXCLUDE_CONTRIB_REPOS`
   Boolean option for excluding non-owned repositories contributed to in the generated statistic visualizations
     - `false` by default
 
@@ -126,7 +153,7 @@ Generate daily updated visualizations of user and repository statistics from the
     * `<boolean>`
   * examples:
     * `true`
-* ### Optional Secret *Name*: `EXCLUDE_ARCHIVE_REPOS`
+* ### Optional Secret *Name*: `IS_EXCLUDE_ARCHIVE_REPOS`
   Boolean option for excluding archived repositories in the generated statistic visualizations
     - `false` by default
     
@@ -135,7 +162,7 @@ Generate daily updated visualizations of user and repository statistics from the
     * `<boolean>`
   * examples:
     * `true`
-* ### Optional Secret *Name*: `EXCLUDE_PRIVATE_REPOS`
+* ### Optional Secret *Name*: `IS_EXCLUDE_PRIVATE_REPOS`
   Boolean option for excluding private repositories in the generated statistic visualizations
     - for when you want to keep those secrets locked away from prying eyes
     - `false` by default
@@ -145,7 +172,7 @@ Generate daily updated visualizations of user and repository statistics from the
     * `<boolean>`
   * examples:
     * `true`
-* ### Optional Secret *Name*: `EXCLUDE_PUBLIC_REPOS`
+* ### Optional Secret *Name*: `IS_EXCLUDE_PUBLIC_REPOS`
   Boolean option for excluding public repositories in the generated statistic visualizations
     - `false` by default
     
@@ -172,6 +199,15 @@ Generate daily updated visualizations of user and repository statistics from the
     * `<int>`
   * example:
     * `4`
+* ### Optional Secret *Name*: `ONLY_INCLUDED_COLLAB_REPOS`
+  For **ONLY** including collaborative repositories in the generated average contribution statistics calculations
+    - such as when there are fewer collaborative repositories to include than to exclude
+  
+    **Instructions**:
+    * enter *Value* in the following format (separated by commas):
+      * `[owner/repo],[owner/repo],...,[owner/repo]`
+    * example:
+      * `R055A/UniversityProject-A,R055A/UniversityProject-B`
 * ### Optional Secret *Name*: `EXCLUDED_COLLAB_REPOS`
   For excluding collaborative repositories from being included in the average contribution statistics calculations
     - for example, such as for when 
@@ -196,7 +232,7 @@ Generate daily updated visualizations of user and repository statistics from the
     * `[owner/repo],[owner/repo],...,[owner/repo]`
   * example:
     * `imported_ghosted/large_A+_collab_project,slave_trade/larger_A++_project`
-* ### Optional Secret *Name*: `STORE_REPO_VIEWS`
+* ### Optional Secret *Name*: `IS_STORE_REPO_VIEWS`
   Boolean for storing generated repository view statistic visualization data beyond the 14 day-limit GitHub API allows 
     - `true` by default
 
